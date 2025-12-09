@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db-mongo:
+    image: mongo:6.0
+    container_name: pantry_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - pantry-network
+
+  recipe-service:
+    build: ./recipe-service
+    container_name: service_recipe
+    ports:
+      - "5001:5000"
+    depends_on:
+      - db-mongo
+    environment:
+      MONGO_URI: "mongodb://db-mongo:27017"
+    networks:
+      - pantry-network
+
+volumes:
+  mongo_data:
+
+networks:
+  pantry-network:
+    driver: bridge
