@@ -11,6 +11,20 @@ services:
     networks:
       - pantry-network
 
+  db-postgres:
+    image: postgres:15
+    container_name: pantry_postgres
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pantry_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pantry-network
+
   recipe-service:
     build: ./recipe-service
     container_name: service_recipe
@@ -18,13 +32,28 @@ services:
       - "5001:5000"
     depends_on:
       - db-mongo
+    restart: on-failure:5
     environment:
       MONGO_URI: "mongodb://db-mongo:27017"
+    networks:
+      - pantry-network
+  
+  pantry-service:
+    build: ./pantry-service
+    container_name: service_pantry
+    ports:
+      - "5002:5000"
+    depends_on:
+      - db-postgres
+    restart: on-failure:5
+    environment:
+      DATABASE_URL: "postgresql://user:password@db-postgres/pantry_db"
     networks:
       - pantry-network
 
 volumes:
   mongo_data:
+  postgres_data:
 
 networks:
   pantry-network:
