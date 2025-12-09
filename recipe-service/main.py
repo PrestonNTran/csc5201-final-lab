@@ -73,6 +73,19 @@ def get_recipes():
 
     return jsonify(output)
 
+@app.route("/recipes/<id>", methods=["GET"])
+def get_recipe(id):
+    try:
+        object_id = ObjectId(id)
+    except:
+        return jsonify({"error": "Invalid ID format"}), 400
+
+    doc = recipes_collection.find_one({"_id": object_id})
+    if not doc:
+        return jsonify({"error": "Recipe not found"}), 404
+    
+    return jsonify(fix_id(doc))
+
 @app.route("/recipes", methods=["POST"])
 def add_recipe():
     data = request.get_json()

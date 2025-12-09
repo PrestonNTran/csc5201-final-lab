@@ -51,6 +51,20 @@ services:
     networks:
       - pantry-network
 
+  planning-service:
+    build: ./planning-service
+    container_name: service_planning
+    ports:
+      - "5003:5000"
+    depends_on:
+      - db-postgres
+      - recipe-service
+    restart: on-failure:5
+    environment:
+      DATABASE_URL: "postgresql://user:password@db-postgres/pantry_db"
+    networks:
+      - pantry-network
+
 volumes:
   mongo_data:
   postgres_data:
