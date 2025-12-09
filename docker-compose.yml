@@ -25,6 +25,21 @@ services:
     networks:
       - pantry-network
 
+  frontend-service:
+    build: ./frontend-service
+    container_name: service_frontend
+    ports:
+      - "5000:5000"
+    networks:
+      - pantry-network
+    depends_on:
+      recipe-service:
+        condition: service_started
+      pantry-service:
+        condition: service_started
+      planning-service:
+        condition: service_started
+
   recipe-service:
     build: ./recipe-service
     container_name: service_recipe

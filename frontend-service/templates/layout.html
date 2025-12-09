@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+        header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+        .logo {
+            font-size: 1.5rem;
+            text-decoration: none;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            font-weight: bold;
+            color: var(--text-bright);
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        button.danger {
+            background-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">🧭 Home</a>
+        <nav>
+            <a href="/pantry">🥫 Pantry</a>
+            <a href="/recipes">📖 Recipes</a>
+            <a href="/planner">📅 Planner</a>
+        </nav>
+        <div></div> </header>
+
+    <main>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div style="background: var(--background-alt); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                    {% for message in messages %}
+                        <p style="margin: 0;">⚠️ {{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

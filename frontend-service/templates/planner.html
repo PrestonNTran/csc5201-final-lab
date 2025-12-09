@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>📅 Meal Planner</h2>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+    
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Recipe</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plan in plans %}
+                <tr>
+                    <td>{{ plan.date }}</td>
+                    <td><strong>{{ plan.recipe_name }}</strong></td>
+                    <td>✅ Planned</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3">No meals planned yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3>Schedule a Meal</h3>
+        <form action="/planner/create" method="POST">
+            <label>Date</label>
+            <input type="date" name="date" required>
+
+            <label>Recipe</label>
+            <select name="recipe_id" required>
+                <option value="" disabled selected>Select a Recipe...</option>
+                {% for r in recipes %}
+                <option value="{{ r.id }}">{{ r.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Add to Schedule</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

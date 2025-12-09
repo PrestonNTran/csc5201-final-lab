@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>📖 Recipe Catalog</h2>
+
+<div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+    
+    <div>
+        {% for r in recipes %}
+        <details>
+            <summary>
+                <strong>{{ r.name }}</strong>
+            </summary>
+            <div style="padding: 10px; border-left: 2px solid var(--border); margin-top: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h4>Ingredients</h4>
+                    <a href="/recipes/edit/{{ r.id }}">
+                        <button style="padding: 5px 10px; font-size: 0.8rem;">✏️ Edit</button>
+                    </a>
+                </div>
+                <ul>
+                    {% for ing in r.ingredients %}
+                    <li>{{ ing.amount }} {{ ing.unit }} of {{ ing.item }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Instructions:</strong><br>{{ r.instructions }}</p>
+                
+                <form action="/recipes/delete/{{ r.id }}" method="POST" style="margin-top: 10px;">
+                     <button class="danger" style="padding: 5px 10px; font-size: 0.8rem;">Delete Recipe</button>
+                </form>
+            </div>
+        </details>
+        <hr>
+        {% else %}
+        <p>No recipes found.</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        <h3>New Recipe</h3>
+        <form action="/recipes/create" method="POST">
+            <label>Recipe Name</label>
+            <input type="text" name="name" required>
+
+            <label>Ingredients</label>
+            <div id="ingredients-container">
+                </div>
+            <button type="button" onclick="addIngredientRow()" style="background: var(--background-alt); color: var(--text-main);">+ Add Ingredient</button>
+
+            <br><br>
+            <label>Instructions</label>
+            <textarea name="instructions" rows="4"></textarea>
+
+            <button type="submit">Save Recipe</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.onload = addIngredientRow;
+
+    function addIngredientRow() {
+        const container = document.getElementById('ingredients-container');
+        const div = document.createElement('div');
+        div.className = 'input-group';
+        div.innerHTML = `
+            <input type="text" name="items[]" placeholder="Item" required style="flex: 2;">
+            <input type="number" name="amounts[]" step="0.1" placeholder="Qty" required style="flex: 1;">
+            <select name="units[]" style="flex: 1;">
+                {% for u in units %}
+                    <option value="{{ u }}">{{ u }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="danger" onclick="this.parentElement.remove()" style="padding: 0 10px;">X</button>
+        `;
+        container.appendChild(div);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<a href="/recipes">← Back to Catalog</a>
+<h2>✏️ Edit Recipe: {{ recipe.name }}</h2>
+
+<form action="/recipes/update/{{ recipe.id }}" method="POST">
+    <label>Recipe Name</label>
+    <input type="text" name="name" value="{{ recipe.name }}" required>
+
+    <label>Ingredients</label>
+    <div id="ingredients-container">
+        {% for ing in recipe.ingredients %}
+        <div class="input-group">
+            <input type="text" name="items[]" value="{{ ing.item }}" required style="flex: 2;">
+            <input type="number" name="amounts[]" value="{{ ing.amount }}" step="0.1" required style="flex: 1;">
+            <select name="units[]" style="flex: 1;">
+                {% for u in units %}
+                    <option value="{{ u }}" {% if u == ing.unit %}selected{% endif %}>{{ u }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="danger" onclick="this.parentElement.remove()" style="padding: 0 10px;">X</button>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <button type="button" onclick="addIngredientRow()" style="background: var(--background-alt); color: var(--text-main); margin-bottom: 20px;">+ Add Ingredient</button>
+
+    <label>Instructions</label>
+    <textarea name="instructions" rows="6">{{ recipe.instructions }}</textarea>
+
+    <button type="submit">Update Recipe</button>
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function addIngredientRow() {
+        const container = document.getElementById('ingredients-container');
+        const div = document.createElement('div');
+        div.className = 'input-group';
+        div.innerHTML = `
+            <input type="text" name="items[]" placeholder="Item" required style="flex: 2;">
+            <input type="number" name="amounts[]" step="0.1" placeholder="Qty" required style="flex: 1;">
+            <select name="units[]" style="flex: 1;">
+                {% for u in units %}
+                    <option value="{{ u }}">{{ u }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" class="danger" onclick="this.parentElement.remove()" style="padding: 0 10px;">X</button>
+        `;
+        container.appendChild(div);
+    }
+</script>
+{% endblock %}
