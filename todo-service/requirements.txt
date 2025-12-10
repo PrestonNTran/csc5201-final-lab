@@ -1,0 +1,7 @@
+flask
+flask-cors
+flask-sqlalchemy
+psycopg2-binary
+requests
+kafka-python
+python-dateutil

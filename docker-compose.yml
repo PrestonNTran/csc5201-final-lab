@@ -126,6 +126,21 @@ services:
     networks:
       - pantry-network
 
+  todo-service:
+    build: ./todo-service
+    container_name: service_todo
+    ports:
+      - "5005:5000"
+    depends_on:
+      db-postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    environment:
+      DATABASE_URL: "postgresql://user:password@db-postgres/pantry_db"
+    networks:
+      - pantry-network
+
 volumes:
   mongo_data:
   postgres_data:

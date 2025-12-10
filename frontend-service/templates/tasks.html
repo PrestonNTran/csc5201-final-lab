@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    th { white-space: nowrap; }
+    td { vertical-align: middle !important; }
+    .task-done { opacity: 0.5; text-decoration: line-through; }
+</style>
+
+<h2>✅ Prep Tasks</h2>
+
+<div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Due Date</th>
+                    <th>Task</th>
+                    <th style="width: 25%;">Source</th>
+                    <th style="width: 15%;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tasks %}
+                <tr class="{{ 'task-done' if t.status == 'DONE' else '' }}">
+                    <td>{{ t.due_date }}</td>
+                    <td>{{ t.description }}</td>
+                    <td>
+                        {% if t.recipe_name == 'Manual' %}
+                            <span style="color: grey;">Manual</span>
+                        {% else %}
+                            <strong>{{ t.recipe_name }}</strong>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            {% if t.status != 'DONE' %}
+                            <form action="/tasks/complete/{{ t.id }}" method="POST" style="margin: 0;">
+                                <button type="submit" style="padding: 5px 10px; font-size: 0.9em; background-color: var(--links); color: white;">Finish</button>
+                            </form>
+                            {% else %}
+                            <form action="/tasks/complete/{{ t.id }}" method="POST" style="margin: 0;">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button class="danger" style="padding: 5px 10px; font-size: 0.9em;">Clear</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="text-align: center; padding: 20px;">No pending tasks. Relax!</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <div style="position: sticky; top: 20px; background: var(--background); padding: 20px; border: 1px solid var(--border); border-radius: 8px;">
+            <h3 style="margin-top: 0;">Add Custom Task</h3>
+            <form action="/tasks/create" method="POST">
+                <label>Task Description</label>
+                <input type="text" name="description" required placeholder="e.g. Defrost Chicken" style="width: 100%;">
+
+                <label>Due Date</label>
+                <input type="date" name="due_date" required style="width: 100%;">
+
+                <button type="submit" style="width: 100%; margin-top: 10px;">Add Task</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

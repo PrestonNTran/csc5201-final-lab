@@ -1,12 +1,71 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div style="text-align: center; padding: 50px 0;">
-    <p>Manage your ingredients, catalog recipes, and plan your week.</p>
-    <br>
-    <div style="display: flex; gap: 20px; justify-content: center;">
-        <a href="/pantry"><button>Manage Pantry</button></a>
-        <a href="/recipes"><button>Browse Recipes</button></a>
-    </div>
+<style>
+    body {
+        max-width: 95% !important;
+    }
+    :root, .fc {
+        --fc-border-color: black !important;
+        --fc-page-bg-color: white !important;
+        --fc-neutral-bg-color: white !important;
+    }
+    #calendar-wrapper {
+        background: white;
+        padding: 20px;
+        padding-bottom: 40px; 
+        border-radius: 8px;
+        border: 2px solid black;
+        color: black !important;
+        
+        box-sizing: border-box; 
+        width: 100%;
+        margin: 0 auto;
+    }
+    .fc-col-header-cell-cushion, 
+    .fc-daygrid-day-number {     
+        color: black !important;
+        text-decoration: none !important;
+        font-weight: bold;
+    }
+    .fc-scrollgrid,
+    .fc-daygrid-day,
+    .fc-col-header-cell {
+        background-color: white !important;
+        border-color: black !important;
+    }
+    .fc-event { cursor: pointer; }
+</style>
+
+<div style="text-align: center; margin-bottom: 30px;">
+    <h1>Dashboard</h1>
+    <p>Your kitchen at a glance.</p>
 </div>
+
+<div id="calendar-wrapper">
+    <div id='calendar'></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            contentHeight: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,listWeek'
+            },
+            events: '/api/calendar-events',
+            windowResize: function(view) {
+                calendar.updateSize();
+            }
+        });
+        calendar.render();
+    });
+</script>
 {% endblock %}

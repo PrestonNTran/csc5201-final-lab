@@ -8,6 +8,7 @@ RECIPE_API = "http://recipe-service:5000/recipes"
 PANTRY_API = "http://pantry-service:5000/pantry"
 PLANNING_API = "http://planning-service:5000/plans"
 SHOPPING_API = "http://shopping-service:5000/shopping"
+TODO_API = "http://todo-service:5000/todo"
 
 ALLOWED_UNITS = sorted(list({
     "lb", "oz", "g", "kg", 
@@ -207,6 +208,74 @@ def delete_shopping_item(id):
     except Exception as e:
         flash(f"Error deleting item: {e}")
     return redirect(url_for('shopping_list'))
+
+@app.route('/tasks')
+def list_tasks():
+    try:
+        response = requests.get(TODO_API)
+        tasks = response.json() if response.status_code == 200 else []
+        tasks = sorted(tasks, key=lambda x: x['status'])
+    except:
+        tasks = []
+        flash("Error connecting to ToDo Service")
+    return render_template('tasks.html', tasks=tasks)
+
+@app.route('/tasks/create', methods=['POST'])
+def create_manual_task():
+    payload = {
+        "description": request.form.get('description'),
+        "due_date": request.form.get('due_date'),
+        "recipe_name": "Manual"
+    }
+    try:
+        requests.post(TODO_API, json=payload)
+    except Exception as e:
+        flash(f"Error creating task: {e}")
+    return redirect(url_for('list_tasks'))
+
+@app.route('/tasks/complete/<id>', methods=['POST'])
+def complete_task(id):
+    try:
+        if request.form.get('_method') == 'DELETE':
+             requests.delete(f"{TODO_API}/{id}")
+        else:
+             requests.put(f"{TODO_API}/{id}", json={"status": "DONE"})
+    except Exception as e:
+        flash(f"Error updating task: {e}")
+    return redirect(url_for('list_tasks'))
+
+@app.route('/api/calendar-events')
+def calendar_events():
+    events = []
+    try:
+        plans = requests.get(PLANNING_API).json()
+        for p in plans:
+            events.append({
+                "title": f"🍽️ {p['recipe_name']}",
+                "start": p['date'],
+                "color": "#3498db", 
+                "url": "/planner"
+            })
+    except: pass
+
+    try:
+        tasks = requests.get(TODO_API).json()
+        for t in tasks:
+            if t['description'].startswith("Cook "):
+                continue
+
+            color = "#27ae60" if t['status'] == 'DONE' else "#e67e22"
+            prefix = "✅" if t['status'] == 'DONE' else "⬜"
+            
+            events.append({
+                "title": f"{prefix} {t['description']}",
+                "start": t['due_date'],
+                "color": color,
+                "url": "/tasks"
+            })
+    except: pass
+
+    return jsonify(events)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
