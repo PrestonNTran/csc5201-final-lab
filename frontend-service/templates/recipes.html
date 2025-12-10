@@ -1,58 +1,79 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<style>
+    details {
+        background: var(--background-alt);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        padding: 10px;
+    }
+    summary {
+        font-weight: bold;
+        cursor: pointer;
+        padding: 5px;
+    }
+    .recipe-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+    }
+</style>
+
 <h2>📖 Recipe Catalog</h2>
 
-<div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px;">
+<div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
     
     <div>
         {% for r in recipes %}
         <details>
-            <summary>
-                <strong>{{ r.name }}</strong>
-            </summary>
-            <div style="padding: 10px; border-left: 2px solid var(--border); margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h4>Ingredients</h4>
-                    <a href="/recipes/edit/{{ r.id }}">
-                        <button style="padding: 5px 10px; font-size: 0.8rem;">✏️ Edit</button>
-                    </a>
-                </div>
+            <summary>{{ r.name }}</summary>
+            <div style="padding: 10px;">
+                <h4>Ingredients</h4>
                 <ul>
                     {% for ing in r.ingredients %}
                     <li>{{ ing.amount }} {{ ing.unit }} of {{ ing.item }}</li>
                     {% endfor %}
                 </ul>
-                <p><strong>Instructions:</strong><br>{{ r.instructions }}</p>
+                <h4>Instructions</h4>
+                <p style="white-space: pre-wrap;">{{ r.instructions }}</p>
                 
-                <form action="/recipes/delete/{{ r.id }}" method="POST" style="margin-top: 10px;">
-                     <button class="danger" style="padding: 5px 10px; font-size: 0.8rem;">Delete Recipe</button>
-                </form>
+                <div class="recipe-actions">
+                    <a href="/recipes/edit/{{ r.id }}" style="text-decoration: none;">
+                        <button style="padding: 5px 15px;">✏️ Edit</button>
+                    </a>
+                    <form action="/recipes/delete/{{ r.id }}" method="POST" style="margin: 0;">
+                        <button class="danger" style="padding: 5px 15px;">Delete</button>
+                    </form>
+                </div>
             </div>
         </details>
-        <hr>
         {% else %}
-        <p>No recipes found.</p>
+        <p style="text-align: center;">No recipes found. Create one!</p>
         {% endfor %}
     </div>
 
     <div>
-        <h3>New Recipe</h3>
-        <form action="/recipes/create" method="POST">
-            <label>Recipe Name</label>
-            <input type="text" name="name" required>
+        <div style="position: sticky; top: 20px; background: var(--background); padding: 20px; border: 1px solid var(--border); border-radius: 8px;">
+            <h3 style="margin-top: 0;">New Recipe</h3>
+            <form action="/recipes/create" method="POST">
+                <label>Recipe Name</label>
+                <input type="text" name="name" required style="width: 100%;">
 
-            <label>Ingredients</label>
-            <div id="ingredients-container">
-                </div>
-            <button type="button" onclick="addIngredientRow()" style="background: var(--background-alt); color: var(--text-main);">+ Add Ingredient</button>
+                <label>Ingredients</label>
+                <div id="ingredients-container">
+                    </div>
+                <button type="button" onclick="addIngredientRow()" style="width: 100%; background: var(--background-alt); color: var(--text-main); margin-bottom: 15px;">+ Add Ingredient</button>
 
-            <br><br>
-            <label>Instructions</label>
-            <textarea name="instructions" rows="4"></textarea>
+                <label>Instructions</label>
+                <textarea name="instructions" rows="4" style="width: 100%;"></textarea>
 
-            <button type="submit">Save Recipe</button>
-        </form>
+                <button type="submit" style="width: 100%; margin-top: 10px;">Save Recipe</button>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -67,8 +88,8 @@
         div.className = 'input-group';
         div.innerHTML = `
             <input type="text" name="items[]" placeholder="Item" required style="flex: 2;">
-            <input type="number" name="amounts[]" step="0.1" placeholder="Qty" required style="flex: 1;">
-            <select name="units[]" style="flex: 1;">
+            <input type="number" name="amounts[]" step="0.1" placeholder="Qty" required style="flex: 1; min-width: 60px;">
+            <select name="units[]" style="flex: 1; min-width: 70px;">
                 {% for u in units %}
                     <option value="{{ u }}">{{ u }}</option>
                 {% endfor %}

@@ -77,30 +77,25 @@ def add_pantry_item():
     db.session.commit()
     return jsonify(new_item.to_dict()), 201
 
-@app.route("/pantry/<int:id>", methods=["PUT"])
+@app.route('/pantry/update/<id>', methods=['POST'])
 def update_pantry_item(id):
-    item = Ingredient.query.get_or_404(id)
-    data = request.get_json()
+    payload = {}
+    qty = request.form.get('quantity')
+    if qty:
+        payload['quantity'] = float(qty)
 
-    if "name" in data:
-        item.name = data["name"]
-    
-    if "quantity" in data:
-        try:
-            item.quantity = float(data["quantity"])
-        except ValueError:
-            return jsonify({"error": "Quantity must be a number"}), 400
-            
-    if "unit" in data:
-        if data["unit"].lower() not in ALLOWED_UNITS:
-            return jsonify({"error": "Invalid unit"}), 400
-        item.unit = data["unit"].lower()
+    date = request.form.get('expiration_date')
+    if date:
+        payload['expiration_date'] = date
+
+    try:
+        url = f"{PANTRY_API}/{id}"
+        requests.put(url, json=payload)
+        flash("Item updated successfully!")
+    except Exception as e:
+        flash(f"Error updating item: {e}")
         
-    if "expiration_date" in data:
-        item.expiration_date = data["expiration_date"]
-
-    db.session.commit()
-    return jsonify(item.to_dict())
+    return redirect(url_for('list_pantry'))
 
 @app.route("/pantry/<int:id>", methods=["DELETE"])
 def delete_pantry_item(id):

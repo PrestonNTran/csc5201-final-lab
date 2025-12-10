@@ -1,58 +1,87 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<style>
+    th {
+        white-space: nowrap;
+    }
+    table input {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+    td {
+        vertical-align: middle !important;
+    }
+    td form {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+    }
+</style>
+
 <h2>🥫 My Pantry</h2>
 
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+<div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
     
-    <div>
-        <table>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr>
                     <th>Item</th>
-                    <th style="width: 150px;">Qty (Update)</th>
-                    <th>Expires</th>
-                    <th>Action</th>
+                    <th style="width: 20%;">Qty</th>
+                    <th style="width: 25%;">Expires</th>
+                    <th style="width: 15%;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in pantry %}
                 <tr>
                     <td>
-                        <strong>{{ item.name }}</strong><br>
-                        <small style="color: grey;">{{ item.unit }}</small>
+                        <strong style="font-size: 1.1em;">{{ item.name }}</strong><br>
+                        <small style="color: #888;">{{ item.unit }}</small>
                     </td>
+                    
                     <td>
-                        <form action="/pantry/update/{{ item.id }}" method="POST" style="display: flex; gap: 5px; margin: 0;">
-                            <input type="number" step="0.1" name="quantity" value="{{ item.quantity }}" style="width: 80px; padding: 5px;">
-                            <button type="submit" style="padding: 5px 10px; margin: 0;">💾</button>
+                        <form action="/pantry/update/{{ item.id }}" method="POST">
+                            <input type="number" step="0.1" name="quantity" value="{{ item.quantity }}" 
+                                   style="width: 70px; padding: 5px;">
+                            <button type="submit" title="Save Qty" style="padding: 5px 10px; margin: 0;">💾</button>
                         </form>
                     </td>
-                    <td>{{ item.expiration_date or '-' }}</td>
+
                     <td>
-                        <form action="/pantry/delete/{{ item.id }}" method="POST" style="margin: 0;">
-                            <button class="danger" style="padding: 5px 10px; font-size: 0.8em;">Remove</button>
+                        <form action="/pantry/update/{{ item.id }}" method="POST">
+                            <input type="date" name="expiration_date" value="{{ item.expiration_date }}" 
+                                   style="padding: 5px; width: 100%; min-width: 130px;">
+                            <button type="submit" title="Save Date" style="padding: 5px 10px; margin: 0;">💾</button>
+                        </form>
+                    </td>
+
+                    <td>
+                        <form action="/pantry/delete/{{ item.id }}" method="POST">
+                            <button class="danger" style="padding: 8px 12px; font-size: 0.9em; width: 100%;">Remove</button>
                         </form>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="4">Your pantry is empty.</td></tr>
+                <tr><td colspan="4" style="text-align: center; padding: 20px;">Your pantry is empty. Add items on the right!</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
     <div>
-        <div style="position: sticky; top: 20px;">
-            <h3>Add Item</h3>
+        <div style="position: sticky; top: 20px; background: var(--background); padding: 20px; border: 1px solid var(--border); border-radius: 8px;">
+            <h3 style="margin-top: 0;">Add Item</h3>
             <form action="/pantry/create" method="POST">
                 <label>Item Name</label>
-                <input type="text" name="name" required placeholder="e.g. Rice">
+                <input type="text" name="name" required placeholder="e.g. Rice" style="width: 100%;">
 
                 <label>Quantity & Unit</label>
                 <div class="input-group">
-                    <input type="number" step="0.1" name="quantity" required placeholder="0.0">
-                    <select name="unit">
+                    <input type="number" step="0.1" name="quantity" required placeholder="0.0" style="flex: 1;">
+                    <select name="unit" style="flex: 1;">
                         {% for u in units %}
                             <option value="{{ u }}">{{ u }}</option>
                         {% endfor %}
@@ -60,9 +89,9 @@
                 </div>
 
                 <label>Expiration Date</label>
-                <input type="date" name="expiration_date">
+                <input type="date" name="expiration_date" style="width: 100%;">
 
-                <button type="submit">Add to Pantry</button>
+                <button type="submit" style="width: 100%; margin-top: 10px;">Add to Pantry</button>
             </form>
         </div>
     </div>
