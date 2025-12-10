@@ -1,8 +1,10 @@
 import os
+import json
 import requests
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from kafka import KafkaProducer
 
 app = Flask(__name__)
 CORS(app)
@@ -29,6 +31,16 @@ class MealPlan(db.Model):
 
 with app.app_context():
     db.create_all()
+
+def get_kafka_producer():
+    try:
+        return KafkaProducer(
+            bootstrap_servers='kafka:9092',
+            value_serializer=lambda v: json.dumps(v).encode('utf-8')
+        )
+    except Exception as e:
+        print(f"Connection to Kafka failed: {e}")
+        return None
 
 def get_recipe_details(recipe_id):
     url = f"http://recipe-service:5000/recipes/{recipe_id}"
@@ -69,6 +81,22 @@ def create_plan():
     )
     db.session.add(new_plan)
     db.session.commit()
+
+    producer = get_kafka_producer()
+    if producer:
+        event = {
+            "event": "MEAL_PLANNED",
+            "date": date,
+            "recipe_id": recipe_id,
+            "recipe_name": recipe['name'],
+            "ingredients": recipe.get('ingredients', [])
+        }
+        producer.send('meal_events', event)
+        producer.flush()
+        print(f"Kafka Event Fired: {event}", flush=True)
+    else:
+        print("Warning: Kafka unavailable, event not sent.", flush=True)
+
     return jsonify(new_plan.to_dict()), 201
 
 @app.route("/plans/<int:id>", methods=["PUT"])
@@ -88,6 +116,22 @@ def update_plan(id):
         plan.recipe_name = recipe["name"]
 
     db.session.commit()
+
+    producer = get_kafka_producer()
+    if producer:
+        event = {
+            "event": "MEAL_PLANNED",
+            "date": date,
+            "recipe_id": recipe_id,
+            "recipe_name": recipe['name'],
+            "ingredients": recipe.get('ingredients', [])
+        }
+        producer.send('meal_events', event)
+        producer.flush()
+        print(f"Kafka Event Fired: {event}", flush=True)
+    else:
+        print("Warning: Kafka unavailable, event not sent.", flush=True)
+
     return jsonify(plan.to_dict())
 
 @app.route("/plans/<int:id>", methods=["DELETE"])
