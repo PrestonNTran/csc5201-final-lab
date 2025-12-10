@@ -47,7 +47,7 @@ def start_metrics():
 
 @app.after_request
 def track_analytics(response):
-    if request.path.startswith('/static') or request.path.startswith('/api'):
+    if request.path.startswith('/static') or request.path.startswith('/api') or request.path == '/favicon.ico':
         return response
 
     duration = (time.time() - g.start_time) * 1000

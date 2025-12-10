@@ -95,7 +95,7 @@ def track_request():
 
 @app.route("/stats", methods=["GET"])
 def get_stats():
-    stats = UsageStat.query.order_by(UsageStat.count.desc()).all()
+    stats = UsageStat.query.order_by(UsageStat.endpoint).all()
     return jsonify([s.to_dict() for s in stats])
 
 if __name__ == "__main__":
