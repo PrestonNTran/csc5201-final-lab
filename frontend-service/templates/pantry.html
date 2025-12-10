@@ -2,42 +2,49 @@
 
 {% block content %}
 <style>
-    th {
-        white-space: nowrap;
+    /* CSS OVERRIDES */
+    th { white-space: nowrap; }
+    
+    table input { 
+        margin-bottom: 0 !important; 
+        margin-top: 0 !important; 
     }
-    table input {
-        margin-bottom: 0 !important;
-        margin-top: 0 !important;
-    }
-    td {
-        vertical-align: middle !important;
-    }
+    
+    td { vertical-align: middle !important; }
+
     td form {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
         margin: 0;
+    }
+
+    /* --- ADD THIS SECTION --- */
+    .input-group {
+        display: flex;
+        gap: 5px;
+        width: 100%;
     }
 </style>
 
 <h2>🥫 My Pantry</h2>
 
-<div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
+<div style="display: grid; grid-template-columns: 3fr 1fr; gap: 40px;">
     
     <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
             <thead>
                 <tr>
-                    <th>Item</th>
-                    <th style="width: 20%;">Qty</th>
-                    <th style="width: 25%;">Expires</th>
-                    <th style="width: 15%;">Action</th>
+                    <th style="width: 25%;">Item</th>
+                    <th style="width: 25%;">Qty</th>
+                    <th style="width: 40%;">Expires</th>
+                    <th style="width: 10%;">Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in pantry %}
                 <tr>
-                    <td>
+                    <td style="overflow: hidden; text-overflow: ellipsis;">
                         <strong style="font-size: 1.1em;">{{ item.name }}</strong><br>
                         <small style="color: #888;">{{ item.unit }}</small>
                     </td>
@@ -45,33 +52,33 @@
                     <td>
                         <form action="/pantry/update/{{ item.id }}" method="POST">
                             <input type="number" step="0.1" name="quantity" value="{{ item.quantity }}" 
-                                   style="width: 70px; padding: 5px;">
-                            <button type="submit" title="Save Qty" style="padding: 5px 10px; margin: 0;">💾</button>
+                                   style="width: 100%; padding: 5px; min-width: 60px;">
+                            <button type="submit" title="Save Qty" style="padding: 5px 8px; margin: 0;">💾</button>
                         </form>
                     </td>
 
                     <td>
                         <form action="/pantry/update/{{ item.id }}" method="POST">
                             <input type="date" name="expiration_date" value="{{ item.expiration_date }}" 
-                                   style="padding: 5px; width: 100%; min-width: 130px;">
-                            <button type="submit" title="Save Date" style="padding: 5px 10px; margin: 0;">💾</button>
+                                   style="padding: 5px; width: 100%; min-width: 110px;">
+                            <button type="submit" title="Save Date" style="padding: 5px 8px; margin: 0;">💾</button>
                         </form>
                     </td>
 
                     <td>
                         <form action="/pantry/delete/{{ item.id }}" method="POST">
-                            <button class="danger" style="padding: 8px 12px; font-size: 0.9em; width: 100%;">Remove</button>
+                            <button class="danger" style="padding: 5px 10px; font-weight: bold;">X</button>
                         </form>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td colspan="4" style="text-align: center; padding: 20px;">Your pantry is empty. Add items on the right!</td></tr>
+                <tr><td colspan="4" style="text-align: center; padding: 20px;">Your pantry is empty.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <div>
+    <div style="min-width: 250px;">
         <div style="position: sticky; top: 20px; background: var(--background); padding: 20px; border: 1px solid var(--border); border-radius: 8px;">
             <h3 style="margin-top: 0;">Add Item</h3>
             <form action="/pantry/create" method="POST">
@@ -79,14 +86,16 @@
                 <input type="text" name="name" required placeholder="e.g. Rice" style="width: 100%;">
 
                 <label>Quantity & Unit</label>
-                <div class="input-group">
-                    <input type="number" step="0.1" name="quantity" required placeholder="0.0" style="flex: 1;">
-                    <select name="unit" style="flex: 1;">
-                        {% for u in units %}
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <input type="number" step="0.1" name="quantity" required placeholder="0.0" 
+                            style="flex: 1; min-width: 0; width: 100%;">
+           
+                        <select name="unit" style="flex: 1; min-width: 0; width: 100%;">
+                            {% for u in units %}
                             <option value="{{ u }}">{{ u }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                 <label>Expiration Date</label>
                 <input type="date" name="expiration_date" style="width: 100%;">
