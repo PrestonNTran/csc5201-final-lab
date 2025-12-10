@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<style>
+    th { white-space: nowrap; }
+    td { vertical-align: middle; }
+</style>
+
+<h2>📊 Admin Analytics</h2>
+
+<div style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Endpoint</th>
+                <th style="width: 10%;">Method</th>
+                <th style="width: 10%;">Hits</th>
+                <th style="width: 10%;">Warn/Err</th>
+                <th style="width: 15%;">Latency</th>
+                <th style="width: 15%;">CPU / Mem</th>
+                <th style="width: 15%;">Success Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in stats %}
+            <tr>
+                <td><code>{{ stat.endpoint }}</code></td>
+                <td><span style="background: var(--background-alt); padding: 3px;">{{ stat.method }}</span></td>
+                <td>{{ stat.hits }}</td>
+                
+                <td>
+                    <span style="color: orange;">{{ stat.warnings }}</span> / 
+                    <span style="color: red;">{{ stat.errors }}</span>
+                </td>
+
+                <td>{{ stat.avg_latency }} ms</td>
+                
+                <td>{{ stat.avg_cpu }}% / {{ stat.avg_mem }}%</td>
+
+                <td>
+                    {% if stat.success_rate > 99 %}
+                        <span style="color: #27ae60; font-weight: bold;">{{ stat.success_rate }}%</span>
+                    {% elif stat.success_rate > 90 %}
+                        <span style="color: orange; font-weight: bold;">{{ stat.success_rate }}%</span>
+                    {% else %}
+                        <span style="color: red; font-weight: bold;">{{ stat.success_rate }}%</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" style="text-align: center; padding: 20px;">No traffic recorded yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

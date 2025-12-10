@@ -1,5 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response, g
+from functools import wraps
+import psutil
+import time
 import requests
+import threading
+
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey' 
@@ -9,12 +14,66 @@ PANTRY_API = "http://pantry-service:5000/pantry"
 PLANNING_API = "http://planning-service:5000/plans"
 SHOPPING_API = "http://shopping-service:5000/shopping"
 TODO_API = "http://todo-service:5000/todo"
+ANALYTICS_API = "http://analytics-service:5000"
+
 
 ALLOWED_UNITS = sorted(list({
     "lb", "oz", "g", "kg", 
     "fl oz", "ml", "l", "cup", "tbsp", "tsp", "gal",
     "unit", "qty", "can", "slice"
 }))
+
+def check_auth(username, password):
+    return username == 'username' and password == 'password'
+
+def authenticate():
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+@app.before_request
+def start_metrics():
+    g.start_time = time.time()
+
+@app.after_request
+def track_analytics(response):
+    if request.path.startswith('/static') or request.path.startswith('/api'):
+        return response
+
+    duration = (time.time() - g.start_time) * 1000
+    cpu_usage = psutil.cpu_percent(interval=None) 
+    mem_usage = psutil.virtual_memory().percent
+
+    status_code = response.status_code
+
+    def send_data(path, method, lat, status, cpu, mem):
+        try:
+            requests.post(f"{ANALYTICS_API}/track", json={
+                "endpoint": path,
+                "method": method,
+                "latency": lat,
+                "status": status,
+                "cpu": cpu,
+                "memory": mem
+            })
+        except:
+            pass
+
+    threading.Thread(target=send_data, args=(
+        request.path, request.method, duration, status_code, cpu_usage, mem_usage
+    )).start()
+    
+    return response
 
 @app.route('/')
 def dashboard():
@@ -276,6 +335,17 @@ def calendar_events():
     except: pass
 
     return jsonify(events)
+
+@app.route('/admin')
+@requires_auth
+def admin_stats():
+    try:
+        response = requests.get(f"{ANALYTICS_API}/stats")
+        stats = response.json() if response.status_code == 200 else []
+    except:
+        stats = []
+        flash("Error connecting to Analytics Service")
+    return render_template('admin.html', stats=stats)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

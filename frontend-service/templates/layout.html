@@ -12,7 +12,7 @@
             padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
             margin-bottom: 40px;
-        }
+        }        
         .logo {
             font-size: 1.5rem;
             text-decoration: none;
@@ -27,31 +27,51 @@
             text-decoration: none;
             font-weight: bold;
             color: var(--text-bright);
-        }
+        }        
         nav a:hover {
             text-decoration: underline;
+        }
+        table tr:nth-child(even),
+        table tr:nth-child(odd) {
+            background-color: transparent !important;
+        }
+        table tr {
+            border-bottom: 1px solid var(--border);
+        }
+        table button {
+            opacity: 1 !important;
+            background-color: var(--background-alt);
+        }
+        button.danger {
+            background-color: #e74c3c !important;
+            color: white !important;
+            border: 1px solid #c0392b !important;
+        }
+        button.danger:hover {
+            background-color: #c0392b !important;
+            opacity: 1 !important;
         }
         .input-group {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
-        button.danger {
-            background-color: #e74c3c;
-        }
     </style>
+    {% block head %}{% endblock %}
 </head>
 <body>
     <header>
         <a href="/" class="logo">Home</a>
-            <nav>
+        <nav>
             <a href="/pantry">Pantry</a>
             <a href="/recipes">Recipes</a>
             <a href="/planner">Planner</a>
             <a href="/shopping">Shopping</a>
             <a href="/tasks">Tasks</a>
-            </nav>
-        <div></div> </header>
+            <a href="/admin">Admin</a>
+        </nav>
+        <div></div>
+    </header>
 
     <main>
         {% with messages = get_flashed_messages() %}

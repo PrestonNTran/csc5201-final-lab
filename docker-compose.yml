@@ -141,6 +141,19 @@ services:
     networks:
       - pantry-network
 
+  analytics-service:
+    build: ./analytics-service
+    container_name: service_analytics
+    ports:
+      - "5006:5000"
+    depends_on:
+      db-postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://user:password@db-postgres/pantry_db"
+    networks:
+      - pantry-network
+
 volumes:
   mongo_data:
   postgres_data:
