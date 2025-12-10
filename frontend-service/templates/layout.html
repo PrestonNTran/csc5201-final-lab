@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Chef's Compass</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
     <style>
+        /* HEADER LAYOUT: Logo Left, Nav Center, Empty Right */
         header {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
@@ -13,29 +14,37 @@
             border-bottom: 1px solid var(--border);
             margin-bottom: 40px;
         }
+        
         .logo {
             font-size: 1.5rem;
             text-decoration: none;
             font-weight: bold;
             color: var(--text-main);
         }
+
         nav {
             display: flex;
             gap: 20px;
         }
+
         nav a {
             text-decoration: none;
             font-weight: bold;
             color: var(--text-bright);
         }
+        
         nav a:hover {
             text-decoration: underline;
         }
+
+        /* Utility for Side-by-Side inputs (used in recipes/pantry forms) */
         .input-group {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
+        
+        /* Make the "Remove" button red */
         button.danger {
             background-color: #e74c3c;
         }
@@ -43,11 +52,12 @@
 </head>
 <body>
     <header>
-        <a href="/" class="logo">🧭 Home</a>
+        <a href="/" class="logo">Home</a>
         <nav>
             <a href="/pantry">🥫 Pantry</a>
             <a href="/recipes">📖 Recipes</a>
             <a href="/planner">📅 Planner</a>
+            <a href="/shopping">🛒 Shopping</a>
         </nav>
         <div></div> </header>
 

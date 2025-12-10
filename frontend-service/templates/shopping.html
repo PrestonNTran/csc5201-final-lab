@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>🛒 Shopping List</h2>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+    
+    <div>
+        <h3>To Buy</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items if item.status == 'PENDING' %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.quantity }} {{ item.unit }}</td>
+                    <td>
+                        <form action="/shopping/buy/{{ item.id }}" method="POST" style="display:inline;">
+                            <button type="submit" style="background-color: var(--links); color: white; padding: 5px 10px;">✅ Bought</button>
+                        </form>
+                        <form action="/shopping/delete/{{ item.id }}" method="POST" style="display:inline;">
+                            <button class="danger" style="padding: 5px 10px;">X</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3">Nothing to buy! Good job.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <br>
+        <details>
+            <summary style="color: grey;">View Completed Items</summary>
+            <table>
+                <tbody>
+                    {% for item in items if item.status == 'BOUGHT' %}
+                    <tr style="opacity: 0.6; text-decoration: line-through;">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }} {{ item.unit }}</td>
+                        <td>
+                            <form action="/shopping/delete/{{ item.id }}" method="POST">
+                                <button class="danger" style="padding: 2px 8px; font-size: 0.8em;">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </details>
+    </div>
+
+    <div>
+        <div style="position: sticky; top: 20px;">
+            <h3>Add Item</h3>
+            <form action="/shopping/create" method="POST">
+                <label>Item Name</label>
+                <input type="text" name="name" required placeholder="e.g. Paper Towels">
+
+                <label>Amount</label>
+                <div class="input-group">
+                    <input type="number" step="0.1" name="quantity" required placeholder="1.0">
+                    <select name="unit">
+                        {% for u in units %}
+                            <option value="{{ u }}">{{ u }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit">Add to List</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

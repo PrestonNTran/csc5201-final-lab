@@ -7,6 +7,7 @@ app.secret_key = 'supersecretkey'
 RECIPE_API = "http://recipe-service:5000/recipes"
 PANTRY_API = "http://pantry-service:5000/pantry"
 PLANNING_API = "http://planning-service:5000/plans"
+SHOPPING_API = "http://shopping-service:5000/shopping"
 
 ALLOWED_UNITS = sorted(list({
     "lb", "oz", "g", "kg", 
@@ -165,6 +166,47 @@ def create_plan():
     requests.post(PLANNING_API, json=payload)
     flash("Meal Planned! Shopping List updating in background...")
     return redirect(url_for('planner'))
+
+@app.route('/shopping')
+def shopping_list():
+    try:
+        response = requests.get(SHOPPING_API)
+        items = response.json() if response.status_code == 200 else []
+    except:
+        items = []
+        flash("Error connecting to Shopping Service")
+    return render_template('shopping.html', items=items, units=ALLOWED_UNITS)
+
+@app.route('/shopping/create', methods=['POST'])
+def add_shopping_item():
+    payload = {
+        "name": request.form.get('name'),
+        "quantity": float(request.form.get('quantity')),
+        "unit": request.form.get('unit')
+    }
+    try:
+        requests.post(SHOPPING_API, json=payload)
+    except Exception as e:
+        flash(f"Error adding item: {e}")
+    return redirect(url_for('shopping_list'))
+
+@app.route('/shopping/buy/<id>', methods=['POST'])
+def mark_bought(id):
+    try:
+        requests.put(f"{SHOPPING_API}/{id}", json={"status": "BOUGHT"})
+        flash("Item marked as bought & added to Pantry!")
+    except Exception as e:
+        flash(f"Error updating item: {e}")
+    return redirect(url_for('shopping_list'))
+
+@app.route('/shopping/delete/<id>', methods=['POST'])
+def delete_shopping_item(id):
+    try:
+        requests.delete(f"{SHOPPING_API}/{id}")
+        flash("Item removed from list.")
+    except Exception as e:
+        flash(f"Error deleting item: {e}")
+    return redirect(url_for('shopping_list'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

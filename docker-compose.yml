@@ -24,6 +24,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - pantry-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d pantry_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -101,6 +106,21 @@ services:
       - db-postgres
       - recipe-service
     restart: on-failure:5
+    environment:
+      DATABASE_URL: "postgresql://user:password@db-postgres/pantry_db"
+    networks:
+      - pantry-network
+
+  shopping-service:
+    build: ./shopping-service
+    container_name: service_shopping
+    ports:
+      - "5004:5000"
+    depends_on:
+      db-postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
     environment:
       DATABASE_URL: "postgresql://user:password@db-postgres/pantry_db"
     networks:
