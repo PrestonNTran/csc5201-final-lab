@@ -45,11 +45,11 @@
     <header>
         <a href="/" class="logo">Home</a>
             <nav>
-            <a href="/pantry">🥫 Pantry</a>
-            <a href="/recipes">📖 Recipes</a>
-            <a href="/planner">📅 Planner</a>
-            <a href="/shopping">🛒 Shopping</a>
-            <a href="/tasks">✅ Tasks</a>
+            <a href="/pantry">Pantry</a>
+            <a href="/recipes">Recipes</a>
+            <a href="/planner">Planner</a>
+            <a href="/shopping">Shopping</a>
+            <a href="/tasks">Tasks</a>
             </nav>
         <div></div> </header>
 
@@ -58,7 +58,7 @@
             {% if messages %}
                 <div style="background: var(--background-alt); padding: 10px; border-radius: 5px; margin-bottom: 20px;">
                     {% for message in messages %}
-                        <p style="margin: 0;">⚠️ {{ message }}</p>
+                        <p style="margin: 0;">{{ message }}</p>
                     {% endfor %}
                 </div>
             {% endif %}

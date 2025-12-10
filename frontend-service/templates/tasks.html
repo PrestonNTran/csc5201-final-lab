@@ -7,7 +7,7 @@
     .task-done { opacity: 0.5; text-decoration: line-through; }
 </style>
 
-<h2>✅ Prep Tasks</h2>
+<h2>Prep Tasks</h2>
 
 <div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
     
@@ -42,7 +42,7 @@
                             {% else %}
                             <form action="/tasks/complete/{{ t.id }}" method="POST" style="margin: 0;">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button class="danger" style="padding: 5px 10px; font-size: 0.9em;">Clear</button>
+                                <button class="danger" style="padding: 5px 10px; font-size: 0.9em;">X</button>
                             </form>
                             {% endif %}
                         </div>

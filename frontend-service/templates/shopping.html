@@ -10,7 +10,7 @@
     }
 </style>
 
-<h2>🛒 Shopping List</h2>
+<h2>Shopping List</h2>
 
 <div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
     
@@ -57,7 +57,7 @@
                         <td>{{ item.quantity }} {{ item.unit }}</td>
                         <td>
                             <form action="/shopping/delete/{{ item.id }}" method="POST" style="margin: 0;">
-                                <button class="danger" style="padding: 2px 8px; font-size: 0.8em;">Clear</button>
+                                <button class="danger" style="padding: 2px 8px; font-size: 0.8em;">X</button>
                             </form>
                         </td>
                     </tr>

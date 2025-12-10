@@ -8,7 +8,7 @@
     td form { margin: 0; }
 </style>
 
-<h2>📅 Meal Planner</h2>
+<h2>Meal Planner</h2>
 
 <div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
     
@@ -30,7 +30,7 @@
                     <td><span style="background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 4px; font-size: 0.9em;">Planned</span></td>
                     <td>
                         <form action="/plans/{{ plan.id }}" method="POST">
-                            <input type="hidden" name="_method" value="DELETE"> <button class="danger" style="padding: 5px 10px; font-size: 0.9em; width: 100%;">Remove</button>
+                            <input type="hidden" name="_method" value="DELETE"> <button class="danger" style="padding: 5px 10px; font-size: 0.9em; width: 100%;">X</button>
                         </form>
                     </td>
                 </tr>

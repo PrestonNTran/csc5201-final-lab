@@ -23,7 +23,7 @@
     }
 </style>
 
-<h2>📖 Recipe Catalog</h2>
+<h2>Recipe Catalog</h2>
 
 <div style="display: grid; grid-template-columns: 7fr 3fr; gap: 40px;">
     
@@ -43,10 +43,10 @@
                 
                 <div class="recipe-actions">
                     <a href="/recipes/edit/{{ r.id }}" style="text-decoration: none;">
-                        <button style="padding: 5px 15px;">✏️ Edit</button>
+                        <button style="padding: 5px 15px;">Edit</button>
                     </a>
                     <form action="/recipes/delete/{{ r.id }}" method="POST" style="margin: 0;">
-                        <button class="danger" style="padding: 5px 15px;">Delete</button>
+                        <button class="danger" style="padding: 5px 15px;">X</button>
                     </form>
                 </div>
             </div>
